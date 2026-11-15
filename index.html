@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Liver, Explained</title>
+  <meta name="description" content="Demo: a 3D, voice-guided explainer of a fictional patient's fatty liver reports." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,400;1,500&family=Atkinson+Hyperlegible+Mono:wght@400;500&family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/samjho/assets/index-BEpKfJXH.js"></script>
+  <link rel="stylesheet" crossorigin href="/samjho/assets/index-BxY44Isq.css">
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <div class="who">
+        <p class="eyebrow">Your liver, from your reports</p>
+        <h1><span class="name">Rahul Menon</span> <span class="meta">42 · Fatty liver (MASLD)</span></h1>
+        <p class="by">Shared by Dr. Ananya Rao, Gastroenterologist</p>
+      </div>
+      <div class="views" role="tablist" aria-label="How to show the liver">
+        <button role="tab" data-view="surface" aria-selected="true">Outside</button>
+        <button role="tab" data-view="inside" aria-selected="false">See the fat</button>
+        <button role="tab" data-view="cells" aria-selected="false">Liver cells</button>
+      </div>
+      <div class="tools">
+        <button class="chip" id="btn-labels" aria-pressed="true" title="Show or hide part names">Labels</button>
+        <button class="chip" id="btn-hands" aria-pressed="false" title="Control the model with your hands using the camera">Hand control</button>
+        <button class="cta" id="btn-tour"><span class="cta-dot" aria-hidden="true"></span><span class="label">Explain my report</span></button>
+      </div>
+    </header>
+
+    <aside class="rail left" aria-label="Reports and plan">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-panel="reports" aria-selected="true">Reports</button>
+        <button role="tab" data-panel="food" aria-selected="false">Food</button>
+        <button role="tab" data-panel="plan" aria-selected="false">Plan</button>
+      </div>
+      <section class="panel" data-panel="reports" id="panel-reports"></section>
+      <section class="panel" data-panel="food" id="panel-food" hidden></section>
+      <section class="panel" data-panel="plan" id="panel-plan" hidden></section>
+    </aside>
+
+    <main class="stage" id="stage">
+      <canvas id="gl" tabindex="0" aria-label="3D model of your liver. Drag to turn, scroll to zoom, arrow keys also work."></canvas>
+      <svg id="leaders" aria-hidden="true"></svg>
+      <div id="labels"></div>
+      <div id="visit-stamp" aria-live="polite"></div>
+      <div id="info" class="info" hidden>
+        <p class="latin"></p>
+        <h2></h2>
+        <p class="about"></p>
+        <div class="row"><button class="link" id="info-ask">Ask Asha about this</button><button class="x" id="info-close" aria-label="Close">×</button></div>
+      </div>
+      <div id="caption" aria-live="polite"></div>
+      <div id="cam" hidden>
+        <video id="cam-video" playsinline muted></video>
+        <canvas id="cam-canvas" width="320" height="240"></canvas>
+        <p id="cam-status">Show your hand to the camera</p>
+      </div>
+      <div id="cursor" hidden><svg viewBox="0 0 40 40"><circle class="ring" cx="20" cy="20" r="15"/><circle class="dwell" cx="20" cy="20" r="15"/></svg></div>
+      <p class="honest">Standard liver shaped by your report numbers, not a scan of your liver · Fictional demo patient</p>
+    </main>
+
+    <aside class="rail right asha" aria-label="Ask Asha">
+      <div class="asha-head">
+        <canvas id="orb" width="240" height="240" aria-hidden="true"></canvas>
+        <div>
+          <h2>Asha</h2>
+          <p class="sub">Your liver guide · answers from Dr. Rao's plan</p>
+          <p class="status" id="asha-status">Ready</p>
+        </div>
+      </div>
+      <button class="talk" id="btn-talk"><span class="mic" aria-hidden="true"></span><span class="label">Talk to Asha</span></button>
+      <p class="latency" id="latency"></p>
+      <div class="transcript" id="transcript" aria-live="polite">
+        <p class="empty">Ask anything about your reports. Asha turns the model to show you while she explains.</p>
+      </div>
+      <div class="chips" id="chips"></div>
+      <form class="ask" id="ask-form">
+        <label class="sr" for="ask-input">Type a question</label>
+        <input id="ask-input" autocomplete="off" placeholder="Type a question…" />
+        <button type="submit">Send</button>
+      </form>
+      <p class="error" id="asha-error" role="alert" hidden></p>
+    </aside>
+
+    <footer class="timeline" aria-label="Your visits">
+      <button class="play" id="btn-progress"><span class="tri" aria-hidden="true"></span>Show my progress</button>
+      <div class="track" id="track">
+        <div class="rail-line"><div class="fill" id="track-fill"></div></div>
+        <input type="range" id="scrub" min="0" max="2" step="0.001" value="0" aria-label="Move through your visits" />
+        <ol class="nodes" id="nodes"></ol>
+      </div>
+      <div class="next"><span class="dash" aria-hidden="true"></span><span><b>Next check</b><br />8 Dec 2026</span></div>
+    </footer>
+
+    <div id="intro" class="intro">
+      <div class="intro-card">
+        <p class="eyebrow">Demo Liver Clinic · Hyderabad</p>
+        <h2>Dr. Ananya Rao shared<br /><em>3 reports</em> with you</h2>
+        <ul class="reports">
+          <li><span class="d">10 Mar 2026</span><span>Ultrasound, FibroScan, liver blood test</span></li>
+          <li><span class="d">9 Jun 2026</span><span>Ultrasound, FibroScan, liver blood test</span></li>
+          <li><span class="d">8 Sep 2026</span><span>Ultrasound, FibroScan, liver blood test</span></li>
+        </ul>
+        <p class="lede">We turned them into a model of your liver that you can turn, open up and ask questions about, until it all makes sense.</p>
+        <button class="cta big" id="btn-open">Open my 3D liver</button>
+        <ol class="build" id="build" hidden>
+          <li>Reading 3 reports</li>
+          <li>Shaping the liver from your liver span</li>
+          <li>Placing fat from your fat score</li>
+          <li>Connecting Asha</li>
+        </ol>
+        <p class="fine">Fictional demo patient. Not medical advice.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
